@@ -3,16 +3,16 @@
 namespace Exceptions
 {
     [Serializable]
-    public class ATMInsufficientMoney : Exception
+    public class AtmInsufficientMoney : Exception
     {
-        public ATMInsufficientMoney()
+        public AtmInsufficientMoney()
         { }
 
-        public ATMInsufficientMoney(string message)
+        public AtmInsufficientMoney(string message)
             : base(message)
         { }
 
-        public ATMInsufficientMoney(string message, Exception innerException)
+        public AtmInsufficientMoney(string message, Exception innerException)
             : base(message, innerException)
         { }
     }

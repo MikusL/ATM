@@ -2,7 +2,7 @@
 
 namespace Data
 {
-    public interface IATMachine
+    public interface IAtMachine
     {
         ///<summary> ATM manufacturer.</summary>
         string Manufacturer { get; }

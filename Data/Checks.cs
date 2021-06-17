@@ -2,7 +2,7 @@
 
 namespace Data
 {
-    public class Checks
+    public static class Checks
     {
         public static void CardInsertedAndCurrentUserChecks(IPerson currentUser, bool cardInserted)
         {

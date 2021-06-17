@@ -4,14 +4,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace ATM.Tests
 {
     [TestClass]
-    public class ATMachineTests
+    public class AtMachineTests
     {
-        private IATMachine _ATMachine;
+        private IAtMachine _atMachine;
 
         [TestInitialize]
         public void Initialize()
         {
-            _ATMachine = new ATMachine("Manufacturer","Serial-Number");
+            _atMachine = new AtMachine("Manufacturer","Serial-Number");
         }
 
         [TestMethod]

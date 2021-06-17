@@ -3,16 +3,16 @@
 namespace Exceptions
 {
     [Serializable]
-    public class ATMAlreadyExists : Exception
+    public class AtmAlreadyExists : Exception
     {
-        public ATMAlreadyExists()
+        public AtmAlreadyExists()
         { }
 
-        public ATMAlreadyExists(string message)
+        public AtmAlreadyExists(string message)
             : base(message)
         { }
 
-        public ATMAlreadyExists(string message, Exception innerException)
+        public AtmAlreadyExists(string message, Exception innerException)
             : base(message, innerException)
         { }
     }

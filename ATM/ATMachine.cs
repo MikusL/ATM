@@ -5,7 +5,7 @@ using Exceptions;
 
 namespace ATM
 {
-    public class ATMachine : IATMachine
+    public class AtMachine : IAtMachine
     {
         private Money _totalMoney;
         private bool _cardInserted;
@@ -13,7 +13,7 @@ namespace ATM
         public string Manufacturer { get; }
         public string SerialNumber { get; }
 
-        public ATMachine(string manufacturer, string serialNumber)
+        public AtMachine(string manufacturer, string serialNumber)
         {
             Manufacturer = manufacturer;
             SerialNumber = serialNumber;
@@ -54,7 +54,7 @@ namespace ATM
             Checks.CardInsertedAndCurrentUserChecks(_currentUser, _cardInserted);
             if (amount % 5 != 0 || amount <= 0) throw new InvalidInput("Invalid amount input");
             if (_currentUser.Balance < amount) throw new InsufficientBalance("The clients balance is too low");
-            if (_totalMoney.Amount < amount) throw new ATMInsufficientMoney("The ATM does not have enough money to withdraw the given amount");
+            if (_totalMoney.Amount < amount) throw new AtmInsufficientMoney("The ATM does not have enough money to withdraw the given amount");
 
             _currentUser.Balance -= amount;
             _totalMoney.Amount -= amount;
@@ -81,7 +81,7 @@ namespace ATM
             }
 
             _currentUser.Balance -= fee;
-            Bank.FeeList.Add(new Fee(fee,_currentUser.CardNumber));
+            Database.FeeList.Add(new Fee(fee,_currentUser.CardNumber));
 
             return money;
         }
@@ -112,7 +112,7 @@ namespace ATM
 
             var temp = new List<Fee>();
 
-            foreach (var fee in Bank.FeeList)
+            foreach (var fee in Database.FeeList)
             {
                 if (fee.CardNumber == _currentUser.CardNumber)
                 {

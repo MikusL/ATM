@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Data;
 using Exceptions;
@@ -8,17 +7,12 @@ namespace ATM
 {
     public class Bank
     {
-        public static IList<Client> ClientList { get; set; }
-        public static IList<Operator> OperatorList { get; set; }
-        public static IList<string> CardNumberList { get; set; }
-        public static IList<ATMachine> ATMList { get; set; }
-        public static IList<Fee> FeeList { get; set; }
         public static string ClientPrefix;
         public static string OperatorPrefix;
         public string Name;
         private Money _totalMoney;
-        private int _clientID;
-        private int _employeeID;
+        private int _clientId;
+        private int _employeeId;
         
 
         public Bank(string clientPrefix,string operatorPrefix, Money totalMoney, string bankName)
@@ -27,71 +21,64 @@ namespace ATM
             OperatorPrefix = operatorPrefix;
             _totalMoney = totalMoney;
             Name = bankName;
-            FeeList = new List<Fee>();
-            ClientList = new List<Client>();
-            ATMList = new List<ATMachine>();
-            OperatorList = new List<Operator>();
-            CardNumberList = new List<string>();
         }
 
-        public void AddATMachine(string manufacturer, string serialNumber)
+        public void AddAtMachine(string manufacturer, string serialNumber)
         {
-            if (ATMList.FirstOrDefault(x => x.SerialNumber == serialNumber) != null)
+            if (Database.AtmList.FirstOrDefault(x => x.SerialNumber == serialNumber) != null)
             {
-                throw new ATMAlreadyExists("That ATM already exists in our database");
+                throw new AtmAlreadyExists("That ATM already exists in our database");
             }
 
-            ATMList.Add(new ATMachine(manufacturer, serialNumber));
+            Database.AtmList.Add(new AtMachine(manufacturer, serialNumber));
         }
 
-        public void RemoveATMachine(string serialNumber)
+        public void RemoveAtMachine(string serialNumber)
         {
-            var ATM = ATMList.FirstOrDefault(x => x.SerialNumber == serialNumber);
+            var atm = Database.AtmList.FirstOrDefault(x => x.SerialNumber == serialNumber);
 
-            if (ATM == null) throw new ATMDoesNotExist("There is no ATM with that serial number");
+            if (atm == null) throw new AtmDoesNotExist("There is no ATM with that serial number");
 
-            ATMList.Remove(ATM);
+            Database.AtmList.Remove(atm);
         }
 
         public void AddOperator(string name, string surname)
         {
-            if (OperatorList.FirstOrDefault(x => x.Name == name && x.Surname == surname) != null)
-            {
+            if (Database.OperatorList.FirstOrDefault(x => x.Name == name && x.Surname == surname) != null) 
                 throw new OperatorAlreadyExists("That operator already exists in our database");
-            }
 
-            OperatorList.Add(new Operator(name, surname, ++_employeeID, OperatorPrefix));
+            Database.OperatorList.Add(new Operator(name, surname, ++_employeeId, OperatorPrefix, Database.CardNumberList));
         }
 
-        public void RemoveOperator(int employeeID)
+        public void RemoveOperator(int employeeId)
         {
-            var operatorObject = OperatorList.FirstOrDefault(x => x.EmployeeID == employeeID);
+            var operatorObject = Database.OperatorList.FirstOrDefault(x => x.EmployeeId == employeeId);
 
             if (operatorObject == null) throw new OperatorDoesNotExist("There is no operator with that employee ID");
 
-            OperatorList.Remove(operatorObject);
+            Database.OperatorList.Remove(operatorObject);
         }
 
-        public void AddClient(string name, string surname, DateTime DoB)
+        public void AddClient(string name, string surname, DateTime doB)
         {
-            if (ClientList.FirstOrDefault(x => x.Name == name && x.Surname == surname) != null)
+            if (Database.ClientList.FirstOrDefault(x => x.Name == name && x.Surname == surname) != null)
             {
                 throw new ClientAlreadyExists("That client already exists in our database");
             }
 
-            ClientList.Add(new Client(DoB, name, surname, ++_clientID, ClientPrefix));
+            Database.ClientList.Add(new Client(doB, name, surname, ++_clientId, ClientPrefix, Database.CardNumberList));
         }
 
-        public void DeleteClient(int clientID)
+        public void DeleteClient(int clientId)
         {
-            if (GetClientByID(clientID).Balance != 0) throw new InvalidAction("The clients balance is not zero");
-           
-            ClientList.Remove(GetClientByID(clientID));
+            if (GetClientById(clientId).Balance != 0) throw new InvalidAction("The clients balance is not zero");
+
+            Database.ClientList.Remove(GetClientById(clientId));
         }
 
-        public Money ClientWithdrawsMoney(int amount, int clientID)
+        public Money ClientWithdrawsMoney(int amount, int clientId)
         {
-            var client = GetClientByID(clientID);
+            var client = GetClientById(clientId);
 
             if (client.Balance < amount) throw new InsufficientBalance("The client does not have enough money");
 
@@ -121,9 +108,9 @@ namespace ATM
             return money;
         }
 
-        public void ClientDepositsMoney(Money amount, int clientID)
+        public void ClientDepositsMoney(Money amount, int clientId)
         {
-            var client = GetClientByID(clientID);
+            var client = GetClientById(clientId);
             client.Balance += amount.Amount;
             _totalMoney.Amount += amount.Amount;
 
@@ -133,33 +120,33 @@ namespace ATM
             }
         }
 
-        public decimal ClientBalance(int clientID)
+        public decimal ClientBalance(int clientId)
         {
-            var client = GetClientByID(clientID);
+            var client = GetClientById(clientId);
             return client.Balance;
         }
 
-        public static ATMachine GetATMBySerialNumber(string serialNumber)
+        public static AtMachine GetAtmBySerialNumber(string serialNumber)
         {
-            var ATM = ATMList.FirstOrDefault(x => x.SerialNumber == serialNumber);
+            var atm = Database.AtmList.FirstOrDefault(x => x.SerialNumber == serialNumber);
 
-            if (ATM == null) throw new ATMDoesNotExist("There is no ATMachine with that serial number");
+            if (atm == null) throw new AtmDoesNotExist("There is no ATMachine with that serial number");
 
-            return ATM;
+            return (AtMachine) atm;
         }
 
         public static Operator GetOperatorByCardNumber(string cardNumber)
         {
-            var operatorObject = OperatorList.FirstOrDefault(x => x.CardNumber == cardNumber);
+            var operatorObject = Database.OperatorList.FirstOrDefault(x => x.CardNumber == cardNumber);
 
             if (operatorObject == null) throw new OperatorDoesNotExist("There is no operator with that card number");
             
             return operatorObject;
         }
 
-        public static Operator GetOperatorByEmployeeID(int employeeID)
+        public static Operator GetOperatorByEmployeeId(int employeeId)
         {
-            var operatorObject = OperatorList.FirstOrDefault(x => x.EmployeeID == employeeID);
+            var operatorObject = Database.OperatorList.FirstOrDefault(x => x.EmployeeId == employeeId);
 
             if (operatorObject == null) throw new OperatorDoesNotExist("There is no operator with that employee id");
 
@@ -168,16 +155,16 @@ namespace ATM
 
         public static Operator GetOperatorByFullName(string name, string surname)
         {
-            var operatorObject = OperatorList.FirstOrDefault(x => x.Name == name && x.Surname == surname);
+            var operatorObject = Database.OperatorList.FirstOrDefault(x => x.Name == name && x.Surname == surname);
 
             if (operatorObject == null) throw new OperatorDoesNotExist("There is no operator with that name and surname");
 
             return operatorObject;
         }
 
-        public static Client GetClientByID(int id)
+        public static Client GetClientById(int id)
         {
-            var client = ClientList.FirstOrDefault(x => x.ID == id);
+            var client = Database.ClientList.FirstOrDefault(x => x.Id == id);
 
             if (client == null) throw new ClientDoesNotExist("There is no client with that id");
 
@@ -186,7 +173,7 @@ namespace ATM
 
         public static Client GetClientByCardNumber(string cardNumber)
         {
-            var client = ClientList.FirstOrDefault(x => x.CardNumber == cardNumber);
+            var client = Database.ClientList.FirstOrDefault(x => x.CardNumber == cardNumber);
 
             if (client == null) throw new ClientDoesNotExist("There is no client with that card number");
             
@@ -195,7 +182,7 @@ namespace ATM
 
         public static Client GetClientByFullName(string name, string surname)
         {
-            var client = ClientList.FirstOrDefault(x => x.Name == name && x.Surname == surname);
+            var client = Database.ClientList.FirstOrDefault(x => x.Name == name && x.Surname == surname);
 
             if (client == null) throw new ClientDoesNotExist("There is no client with that name and surname");
 
